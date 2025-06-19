@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMER
+  EXECUTOR
+  ADMIN
+}
+
+enum WorkOrderStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELED
+  PENDING_CONFIRMATION
+}
+
+model User {
+  id       String   @id @default(uuid())
+  email    String   @unique
+  name     String?
+  role     Role
+
+  customerWorkOrders WorkOrder[] @relation("WorkOrdersConfirmed")
+  createdWorkOrders  WorkOrder[] @relation("WorkOrdersCreated")
+  completedWorkOrders   WorkOrder[] @relation("WorkOrdersСompleted")
+
+  createdAt DateTime @default(now())
+}
+
+model WorkOrder {
+  id          String           @id @default(uuid())
+  status      WorkOrderStatus  @default(PENDING)
+  description String?
+
+  object             String
+  needWorkText       String?
+  completedWorkText  String?
+  photoUrl           String?
+
+  createdById String
+  createdBy   User @relation("WorkOrdersCreated", fields: [createdById], references: [id])
+
+  completedById String?
+  completedBy   User? @relation("WorkOrdersСompleted", fields: [completedById], references: [id])
+
+  confirmedById  String?
+  confirmedBy    User? @relation("WorkOrdersConfirmed", fields: [confirmedById], references: [id])
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  completedAt DateTime?
+}
