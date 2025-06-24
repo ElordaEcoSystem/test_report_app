@@ -44,3 +44,10 @@ export async function updateWorkOrder(id: string, data: any) {
   })
   if (!res.ok) throw new Error('Ошибка при обновлении заявки')
 }
+
+
+export async function fetchUsers() {
+  const res = await fetch('/api/users')
+  if (!res.ok) throw new Error('Ошибка при загрузке заявок')
+  return res.json()
+}
