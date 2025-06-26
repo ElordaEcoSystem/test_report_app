@@ -142,7 +142,7 @@ export const InvoicePDF = ({ orders,user,monthIndex }: InvoicePDFProps) => {
 
           <Text style={styles.main_text}>
             В период с 1 по {numberOfDays} {monthNames.genitive[monthIndex]} 2025 года инженерами КИП {user} на базе Предприятия успешно проведено плановое ремонтное обслуживание оборудования и систем, что позволило обеспечить бесперебойную работу насосных агрегатов и других технических устройств. В рамках проведения работ был выполнен ряд задач, связанных с диагностикой, сборкой, подключением и настройкой различных элементов насосных установок.
-//           </Text>
+           </Text>
         </View>
 
         <Table data={orders} userName={user} monthIndex={monthIndex}/>

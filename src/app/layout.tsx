@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { GlobalProvider } from "@/contex/GlobalStateProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 
 export const metadata: Metadata = {
@@ -19,9 +20,10 @@ export default function RootLayout({
           <body>
             {/* <main className='h-screen flex flex-col justify-center items-center'> */}
               {/* <Navbar /> */}
-              <GlobalProvider>
+              {/* <GlobalProvider> */}
                 {children}
-              </GlobalProvider>
+                <Toaster  position="top-center" richColors />
+              {/* </GlobalProvider> */}
             {/* </main> */}
           </body>
     </html>

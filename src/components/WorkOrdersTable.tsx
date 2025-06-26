@@ -34,7 +34,23 @@ export default function WorkOrdersTable() {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"card" | "table">("card");
- 
+  const [filteredOrders, setFilteredOrders] = useState<any[]>([]);
+
+  const handleFilter = (user: string, month: number) => {
+  const result = orders.filter((order) => {
+    const orderMonth = new Date(order.createdAt).getMonth();
+    return (
+      order.createdBy?.name === user &&
+      orderMonth === month
+    );
+  });
+  console.log("WorkOrdersTable = ",result)
+  setFilteredOrders(result);
+};
+
+const handleReset = () => {
+  setFilteredOrders(orders);
+};
 
   const handleGeneratePDF = async (user: string, month: number) => {
     const blob = await pdf(<InvoicePDF orders={orders} user={user} monthIndex={month} />).toBlob();
@@ -42,14 +58,24 @@ export default function WorkOrdersTable() {
   };
 
   useEffect(() => {
-  const refresh = async () => {
-    const [ordersData, usersData] = await Promise.all([fetchWorkOrders(), fetchUsers()]);
-    setOrders(ordersData);
-    setUsers(usersData);
-    setLoading(false);
-  };
-  refresh();
-}, []);
+    const refresh = async () => {
+      const [ordersData, usersData] = await Promise.all([fetchWorkOrders(), fetchUsers()]);
+      setOrders(ordersData);
+      setFilteredOrders(ordersData); // начальное значение = все
+      setUsers(usersData);
+      setLoading(false);
+    };
+    refresh();
+  }, []);
+//   useEffect(() => {
+//   const refresh = async () => {
+//     const [ordersData, usersData] = await Promise.all([fetchWorkOrders(), fetchUsers()]);
+//     setOrders(ordersData);
+//     setUsers(usersData);
+//     setLoading(false);
+//   };
+//   refresh();
+// }, []);
   if (loading) return <div className="p-4">Загрузка...</div>;
   console.log(users)
 
@@ -60,7 +86,12 @@ export default function WorkOrdersTable() {
       <div className="sticky top-0 z-10 bg-white dark:bg-background px-4 py-3 border-b flex justify-between items-center">
         <h1 className="text-2xl font-semibold">Заявки</h1>
         <div className='hidden md:block'>
-          <FilterPanel users={users} onGeneratePDF={handleGeneratePDF}/>
+          <FilterPanel
+            users={users}
+            onGeneratePDF={handleGeneratePDF}
+            onFilter={handleFilter}
+            onReset={handleReset}
+          />
         </div>
       </div>
 
@@ -80,7 +111,7 @@ export default function WorkOrdersTable() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {orders.map((order) => (
+                  {filteredOrders.map((order) => (
                     <TableRow key={order.id}>
                       <TableCell>
                         {new Date(order.createdAt).toLocaleDateString()}
@@ -136,13 +167,13 @@ export default function WorkOrdersTable() {
               <Card key={order.id} className="p-4  overflow-hidden">
                 {order.photoUrl && (
                   <div className="mb-3">
-                    <Image
-                      src={`/uploads/report_photo${order.photoUrl}`}
-                      alt="Фото выполненных работ"
-                      width={600}
-                      height={400}
-                      className="w-full max-h-60 object-cover rounded-md border"
-                    />
+                   <Image
+                    src={`/uploads/report_photo${order.photoUrl}`}
+                    alt="Фото выполненных работ"
+                    width={600}
+                    height={400}
+                    className="w-full object-contain rounded-md border"
+                  />
                     {/* {console.log("test", order.photoUrl)} */}
                   </div>
                 )}

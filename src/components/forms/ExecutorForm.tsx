@@ -90,6 +90,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { annotateImage } from "@/lib/annotateImage";
+
 
 const schema = z.object({
   object: z.string().min(1),
@@ -108,12 +110,45 @@ export function ExecutorForm({ onSubmit }: { onSubmit: (data: any) => void }) {
 
   const [uploading, setUploading] = useState(false);
 
+  // const handleFormSubmit = async (data: any) => {
+  //   if (!data.photo[0]) return alert("Выберите фото");
+
+  //   setUploading(true);
+  //   const formData = new FormData();
+  //   formData.append("file", data.photo[0]);
+
+  //   const res = await fetch("/api/upload", {
+  //     method: "POST",
+  //     body: formData,
+  //   });
+
+  //   const json = await res.json();
+  //   setUploading(false);
+
+  //   if (!res.ok) return alert("Ошибка при загрузке фото");
+
+  //   const photoUrl = json.url;
+
+  //   onSubmit({
+  //     object: data.object,
+  //     completedWorkText: data.completedWorkText,
+  //     photoUrl,
+  //   });
+  // };
   const handleFormSubmit = async (data: any) => {
     if (!data.photo[0]) return alert("Выберите фото");
 
     setUploading(true);
+
+    // Аннотируем изображение
+    const processedImage = await annotateImage({
+      file: data.photo[0],
+      object: data.object,
+      logoSrc:  "/logo.jpg"
+    });
+
     const formData = new FormData();
-    formData.append("file", data.photo[0]);
+    formData.append("file", processedImage, "photo.jpg");
 
     const res = await fetch("/api/upload", {
       method: "POST",
